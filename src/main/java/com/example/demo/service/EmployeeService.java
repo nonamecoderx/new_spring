@@ -1,9 +1,11 @@
 //создали сервис, служит для работы с базой сотрудников.
 package com.example.demo.service;
 
+import com.example.demo.exception.InvalidEmployeeRequestException;
 import com.example.demo.model.Employee;
 import com.example.demo.record.EmployeeRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,8 +20,9 @@ public class EmployeeService {
     }
 
     public Employee addEmployee(EmployeeRequest employeeRequest) {
-        if (employeeRequest.getFirstName() == null || employeeRequest.getLastName() == null) {
-            throw new IllegalArgumentException("Employee firstname or lastname should be set");
+        if (!StringUtils.isAlpha(employeeRequest.getFirstName()) ||
+                !StringUtils.isAlpha(employeeRequest.getLastName())) {
+            throw new InvalidEmployeeRequestException();
         }
         Employee employee = new Employee(employeeRequest.getFirstName(),
                 employeeRequest.getLastName(),
@@ -48,11 +51,11 @@ public class EmployeeService {
     }
 
     public Set<Employee> getHigherAverage() {
-        if (employees.size() == 0){
+        if (employees.size() == 0) {
             throw new RuntimeException("Добавьте хоть одного сотрудника");
         }
-        int average = getSalarySum()/employees.size();
-        return employees.values().stream().filter(s->s.getSalary()>average).collect(Collectors.toSet());
+        int average = getSalarySum() / employees.size();
+        return employees.values().stream().filter(s -> s.getSalary() > average).collect(Collectors.toSet());
     }
 }
 
